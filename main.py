@@ -12,9 +12,13 @@ buffer = []
 lock = threading.Lock()
 condition = threading.Condition(lock)
 
+# Flag to indicate whether the producer has finished producing
+producer_done = False
+
 # Producer thread
 class Producer(threading.Thread):
     def run(self):
+        global producer_done
         for _ in range(MAX_COUNT):
             number = random.randint(LOWER_NUM, UPPER_NUM)
             with condition:
@@ -24,6 +28,7 @@ class Producer(threading.Thread):
                 with open("all.txt", "a") as f:
                     f.write(str(number) + "\n")
                 condition.notify_all()
+        producer_done = True
 
 # Customer threads
 class Customer(threading.Thread):
@@ -35,7 +40,7 @@ class Customer(threading.Thread):
         while True:
             with condition:
                 while not buffer or buffer[-1] % 2 != self.parity:
-                    if len(buffer) == MAX_COUNT:
+                    if producer_done and not buffer:
                         return
                     condition.wait()
                 number = buffer.pop()
@@ -56,8 +61,10 @@ thread_producer.start()
 thread_even_customer.start()
 thread_odd_customer.start()
 
-# Join the threads
+# Join the producer thread
 thread_producer.join()
+
+# Wait for consumers to finish processing remaining items
 thread_even_customer.join()
 thread_odd_customer.join()
 
@@ -65,5 +72,5 @@ time_end = time.time()
 
 time_to_execute = time_end - time_start
 
-print("The printing process is done with an execution time of:", time_to_execute, "sec")
+print("The printing process is done with an execution time of:", time_to_execute,"sec")
 
