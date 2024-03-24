@@ -5,8 +5,9 @@
                            |、˜〵          
                           じしˍ,)ノ
 
-Name: Vania Agnes Djunaedy
-NIM: 2602158531
-Class: L4BC 
+
+- Name: Vania Agnes Djunaedy
+- NIM: 2602158531
+- Class: L4BC 
 
 This is the code for Assignment 1 Forum Week 6. 
